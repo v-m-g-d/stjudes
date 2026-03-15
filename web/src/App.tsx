@@ -43,6 +43,10 @@ type HealthResponse = {
   storageConfigured: boolean
 }
 
+type AuthMeRecord = {
+  clientPrincipal?: unknown
+}
+
 class ApiError extends Error {
   status: number
 
@@ -203,8 +207,9 @@ function App() {
         setIsAuthenticated(false)
         return
       }
-      const payload = (await response.json()) as Array<{ clientPrincipal?: unknown }>
-      setIsAuthenticated(Boolean(payload[0]?.clientPrincipal))
+      const payload = (await response.json()) as AuthMeRecord | AuthMeRecord[]
+      const records = Array.isArray(payload) ? payload : [payload]
+      setIsAuthenticated(records.some((record) => Boolean(record?.clientPrincipal)))
     } catch {
       setIsAuthenticated(false)
     }
