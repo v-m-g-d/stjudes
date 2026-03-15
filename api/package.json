@@ -1,0 +1,22 @@
+{
+  "name": "stjudes-api",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/src/functions/*.js",
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc -p .",
+    "clean": "rimraf dist",
+    "start": "func start",
+    "prestart": "npm run build"
+  },
+  "dependencies": {
+    "@azure/data-tables": "^13.3.1",
+    "@azure/functions": "^4.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.50",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.9.3"
+  }
+}

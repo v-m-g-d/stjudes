@@ -1,0 +1,14 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "AZURE_TABLES_CONNECTION_STRING": "",
+    "ADMIN_EMAILS": "admin1@example.com,admin2@example.com",
+    "TABLE_USERS": "Users",
+    "TABLE_THREADS": "Threads",
+    "TABLE_COMMENTS": "Comments",
+    "TABLE_NEWS": "News",
+    "TABLE_PLANS": "Plans"
+  }
+}

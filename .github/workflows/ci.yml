@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main, setup/community-hub-mvp]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install web dependencies
+        run: npm install
+        working-directory: web
+      - name: Install api dependencies
+        run: npm install
+        working-directory: api
+      - name: Build web
+        run: npm run build
+        working-directory: web
+      - name: Build api
+        run: npm run build
+        working-directory: api
