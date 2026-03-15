@@ -32,6 +32,7 @@ type PlanItem = {
   title: string
   status: 'draft' | 'review' | 'published'
   updatedAt: string
+  updatedBy: string
 }
 
 type PlanStatus = PlanItem['status']
@@ -630,6 +631,7 @@ function App() {
             <li key={item.id}>
               <strong>{item.title}</strong>
               <p>Status: {item.status}</p>
+              <p className="meta">Last updated by: {item.updatedBy || 'Unknown'}</p>
             </li>
           ))}
         </ul>
@@ -763,6 +765,7 @@ function App() {
                     <p>
                       Current status: <span className="status-pill">{item.status}</span>
                     </p>
+                    <p className="meta">Last updated by: {item.updatedBy || 'Unknown'}</p>
                   </div>
                   <div className="status-actions">
                     <button

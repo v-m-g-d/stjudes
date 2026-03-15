@@ -233,6 +233,12 @@
   opacity: 0.85;
 }
 
+.meta {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
 .moderation-panel {
   border: 1px dashed #d1d5db;
   border-radius: 10px;

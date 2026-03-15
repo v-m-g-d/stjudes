@@ -212,7 +212,7 @@ app.http("updatePlanStatus", {
       return json(400, { message: "status must be one of: draft, review, published" });
     }
 
-    const updated = await updatePlanStatus(planId, status);
+    const updated = await updatePlanStatus(planId, status, getUserEmail(request));
     if (!updated) {
       return json(404, { message: "plan not found" });
     }

@@ -30,6 +30,7 @@ export type PlanItem = {
   title: string;
   status: "draft" | "review" | "published";
   updatedAt: string;
+  updatedBy: string;
 };
 
 export type PlanStatus = PlanItem["status"];
@@ -76,6 +77,7 @@ const memoryTables: Tables = {
       title: "Church Lane crossing improvements",
       status: "review",
       updatedAt: new Date().toISOString(),
+      updatedBy: "admin@example.com",
     },
   ],
 };
@@ -300,12 +302,17 @@ export async function createPlan(item: Pick<PlanItem, "title">): Promise<PlanIte
     title: item.title,
     status: "draft",
     updatedAt: new Date().toISOString(),
+    updatedBy: "system",
   };
   memoryTables.plans.unshift(created);
   return created;
 }
 
-export async function updatePlanStatus(planId: string, status: PlanStatus): Promise<PlanItem | null> {
+export async function updatePlanStatus(
+  planId: string,
+  status: PlanStatus,
+  updatedBy: string,
+): Promise<PlanItem | null> {
   const client = getTableClient(tableNames.plans);
   const updatedAt = new Date().toISOString();
 
@@ -317,6 +324,7 @@ export async function updatePlanStatus(planId: string, status: PlanStatus): Prom
 
     plan.status = status;
     plan.updatedAt = updatedAt;
+    plan.updatedBy = updatedBy;
     return plan;
   }
 
@@ -331,6 +339,7 @@ export async function updatePlanStatus(planId: string, status: PlanStatus): Prom
       rowKey: planId,
       status,
       updatedAt,
+      updatedBy,
     },
     "Merge",
   );
@@ -340,5 +349,6 @@ export async function updatePlanStatus(planId: string, status: PlanStatus): Prom
     title: String(existing.title || ""),
     status,
     updatedAt,
+    updatedBy,
   };
 }
