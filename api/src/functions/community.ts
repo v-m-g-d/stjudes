@@ -1,5 +1,6 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
 import {
+  type PlanStatus,
   approveComment,
   approveThread,
   createComment,
@@ -10,6 +11,7 @@ import {
   listNews,
   listPlans,
   listThreads,
+  updatePlanStatus,
 } from "../data/store";
 
 function json(status: number, body: unknown): HttpResponseInit {
@@ -62,6 +64,18 @@ function requireAdmin(request: HttpRequest): HttpResponseInit | null {
 
   return null;
 }
+
+app.http("getHealth", {
+  methods: ["GET"],
+  route: "health",
+  authLevel: "anonymous",
+  handler: async () =>
+    json(200, {
+      ok: true,
+      utcNow: new Date().toISOString(),
+      storageConfigured: Boolean(process.env.AZURE_TABLES_CONNECTION_STRING),
+    }),
+});
 
 app.http("getThreads", {
   methods: ["GET"],
@@ -144,6 +158,11 @@ app.http("postNews", {
   route: "news",
   authLevel: "anonymous",
   handler: async (request: HttpRequest) => {
+    const authorizationError = requireAdmin(request);
+    if (authorizationError) {
+      return authorizationError;
+    }
+
     const body = await parseBody(request);
     const title = String(body.title || "").trim();
     const summary = String(body.summary || "").trim();
@@ -168,6 +187,11 @@ app.http("postPlans", {
   route: "plans",
   authLevel: "anonymous",
   handler: async (request: HttpRequest, context: InvocationContext) => {
+    const authorizationError = requireAdmin(request);
+    if (authorizationError) {
+      return authorizationError;
+    }
+
     context.info("Creating plan item");
     const body = await parseBody(request);
     const title = String(body.title || "").trim();
@@ -175,6 +199,37 @@ app.http("postPlans", {
       return json(400, { message: "title is required" });
     }
     return json(201, await createPlan({ title }));
+  },
+});
+
+app.http("updatePlanStatus", {
+  methods: ["POST"],
+  route: "plans/{planId}/status",
+  authLevel: "anonymous",
+  handler: async (request: HttpRequest) => {
+    const authorizationError = requireAdmin(request);
+    if (authorizationError) {
+      return authorizationError;
+    }
+
+    const planId = request.params.planId;
+    if (!planId) {
+      return json(400, { message: "planId is required" });
+    }
+
+    const body = await parseBody(request);
+    const status = String(body.status || "").trim().toLowerCase() as PlanStatus;
+    const validStatuses: PlanStatus[] = ["draft", "review", "published"];
+    if (!validStatuses.includes(status)) {
+      return json(400, { message: "status must be one of: draft, review, published" });
+    }
+
+    const updated = await updatePlanStatus(planId, status, getUserEmail(request));
+    if (!updated) {
+      return json(404, { message: "plan not found" });
+    }
+
+    return json(200, updated);
   },
 });
 

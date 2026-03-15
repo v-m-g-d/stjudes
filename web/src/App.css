@@ -233,6 +233,12 @@
   opacity: 0.85;
 }
 
+.meta {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
 .moderation-panel {
   border: 1px dashed #d1d5db;
   border-radius: 10px;
@@ -269,6 +275,21 @@
 
 .moderation-item p {
   margin-top: 0.3rem;
+}
+
+.status-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.status-pill {
+  display: inline-block;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.75rem;
+  text-transform: capitalize;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -323,6 +344,10 @@
   }
 
   .moderation-panel {
+    border-color: #374151;
+  }
+
+  .status-pill {
     border-color: #374151;
   }
 }

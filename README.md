@@ -18,6 +18,7 @@ MVP scaffold for a low-traffic community website with sections for Forum, News, 
    - `npm run build`
 
 ## API endpoints (MVP)
+- `GET /api/health`
 - `GET /api/threads`
 - `POST /api/threads`
 - `GET /api/threads/{threadId}/comments`
