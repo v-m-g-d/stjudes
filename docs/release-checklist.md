@@ -1,14 +1,14 @@
 # MVP Release Checklist
 
-- [ ] Frontend builds successfully (`npm run build -w web`).
-- [ ] API builds successfully (`npm run build -w api`).
-- [ ] Forum endpoints return expected responses.
-- [ ] News and Plans endpoints support list/create actions.
-- [ ] Posting requires authenticated users in SWA route rules.
-- [ ] Basic accessibility checks completed (keyboard + headings + contrast).
-- [ ] Budget alerts configured in Azure.
-- [ ] App Insights sampling and retention configured.
-- [ ] Rollback plan documented (redeploy previous successful build).
+- [x] Frontend builds successfully (`npm run build -w web`).
+- [x] API builds successfully (`npm run build -w api`).
+- [x] Forum endpoints return expected responses.
+- [x] News and Plans endpoints support list/create actions.
+- [x] Posting requires authenticated users in SWA route rules.
+- [x] Basic accessibility checks completed (keyboard + headings + contrast).
+- [x] Budget alerts configured in Azure.
+- [x] App Insights sampling and retention configured.
+- [x] Rollback plan documented (redeploy previous successful build).
 
 ## Rollback Procedure
 
