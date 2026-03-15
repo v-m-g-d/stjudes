@@ -144,6 +144,11 @@ app.http("postNews", {
   route: "news",
   authLevel: "anonymous",
   handler: async (request: HttpRequest) => {
+    const authorizationError = requireAdmin(request);
+    if (authorizationError) {
+      return authorizationError;
+    }
+
     const body = await parseBody(request);
     const title = String(body.title || "").trim();
     const summary = String(body.summary || "").trim();
@@ -168,6 +173,11 @@ app.http("postPlans", {
   route: "plans",
   authLevel: "anonymous",
   handler: async (request: HttpRequest, context: InvocationContext) => {
+    const authorizationError = requireAdmin(request);
+    if (authorizationError) {
+      return authorizationError;
+    }
+
     context.info("Creating plan item");
     const body = await parseBody(request);
     const title = String(body.title || "").trim();

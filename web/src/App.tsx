@@ -331,7 +331,11 @@ function App() {
       setNewsSummary('')
       await loadPrimaryData()
       setStatus('News item created.')
-    } catch {
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 403) {
+        setStatus('Publishing news requires an admin email in ADMIN_EMAILS.')
+        return
+      }
       setStatus('Could not create news item.')
     }
   }
@@ -347,7 +351,11 @@ function App() {
       setPlanTitle('')
       await loadPrimaryData()
       setStatus('Plan item created.')
-    } catch {
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 403) {
+        setStatus('Creating plans requires an admin email in ADMIN_EMAILS.')
+        return
+      }
       setStatus('Could not create plan item.')
     }
   }
