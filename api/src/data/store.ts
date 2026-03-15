@@ -32,6 +32,8 @@ export type PlanItem = {
   updatedAt: string;
 };
 
+export type PlanStatus = PlanItem["status"];
+
 type Tables = {
   threads: Thread[];
   comments: Comment[];
@@ -301,4 +303,42 @@ export async function createPlan(item: Pick<PlanItem, "title">): Promise<PlanIte
   };
   memoryTables.plans.unshift(created);
   return created;
+}
+
+export async function updatePlanStatus(planId: string, status: PlanStatus): Promise<PlanItem | null> {
+  const client = getTableClient(tableNames.plans);
+  const updatedAt = new Date().toISOString();
+
+  if (!client) {
+    const plan = memoryTables.plans.find((item) => item.id === planId);
+    if (!plan) {
+      return null;
+    }
+
+    plan.status = status;
+    plan.updatedAt = updatedAt;
+    return plan;
+  }
+
+  const existing = await client.getEntity<Record<string, unknown>>("plan", planId).catch(() => null);
+  if (!existing) {
+    return null;
+  }
+
+  await client.upsertEntity(
+    {
+      partitionKey: "plan",
+      rowKey: planId,
+      status,
+      updatedAt,
+    },
+    "Merge",
+  );
+
+  return {
+    id: String(existing.rowKey),
+    title: String(existing.title || ""),
+    status,
+    updatedAt,
+  };
 }

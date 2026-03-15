@@ -34,6 +34,8 @@ type PlanItem = {
   updatedAt: string
 }
 
+type PlanStatus = PlanItem['status']
+
 class ApiError extends Error {
   status: number
 
@@ -357,6 +359,25 @@ function App() {
         return
       }
       setStatus('Could not create plan item.')
+    }
+  }
+
+  async function handlePlanStatusChange(planId: string, nextStatus: PlanStatus) {
+    if (!canWrite) {
+      setStatus('Sign in is required to update plans in production.')
+      return
+    }
+
+    try {
+      await postJson<PlanItem>(`/api/plans/${planId}/status`, { status: nextStatus })
+      await loadPrimaryData()
+      setStatus(`Plan status updated to ${nextStatus}.`)
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 403) {
+        setStatus('Updating plan status requires an admin email in ADMIN_EMAILS.')
+        return
+      }
+      setStatus('Could not update plan status.')
     }
   }
 
@@ -730,6 +751,51 @@ function App() {
             Add plan
           </button>
         </form>
+
+        <div className="form">
+          <h3>Update plan status</h3>
+          <ul className="list compact-list">
+            {plans.map((item) => (
+              <li key={item.id}>
+                <div className="moderation-item">
+                  <div>
+                    <strong>{item.title}</strong>
+                    <p>
+                      Current status: <span className="status-pill">{item.status}</span>
+                    </p>
+                  </div>
+                  <div className="status-actions">
+                    <button
+                      type="button"
+                      className="inline-button"
+                      disabled={!canWrite || item.status === 'draft'}
+                      onClick={() => handlePlanStatusChange(item.id, 'draft')}
+                    >
+                      Draft
+                    </button>
+                    <button
+                      type="button"
+                      className="inline-button"
+                      disabled={!canWrite || item.status === 'review'}
+                      onClick={() => handlePlanStatusChange(item.id, 'review')}
+                    >
+                      Review
+                    </button>
+                    <button
+                      type="button"
+                      className="inline-button"
+                      disabled={!canWrite || item.status === 'published'}
+                      onClick={() => handlePlanStatusChange(item.id, 'published')}
+                    >
+                      Publish
+                    </button>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+          {plans.length === 0 && <p className="empty">No plans available to update.</p>}
+        </div>
       </section>
     </main>
   )
