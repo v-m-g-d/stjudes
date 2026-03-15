@@ -56,3 +56,13 @@
 - [ ] Feature branch contains at least one commit ahead of `main` before creating PR.
 - [ ] Create PR with explicit base/head if auto-fill fails:
   - [ ] `gh pr create --base main --head <feature-branch> --title "..." --body "..."`
+
+## 9) Git author identity sanity check
+- [ ] Confirm Git author identity before committing:
+  - [ ] `git config --global user.name "Your Name"`
+  - [ ] `git config --global user.email "you@example.com"`
+- [ ] Verify identity:
+  - [ ] `git config --get user.name`
+  - [ ] `git config --get user.email`
+- [ ] If the latest commit used the wrong author:
+  - [ ] `git commit --amend --reset-author`
