@@ -111,6 +111,49 @@ foreach ($tableName in $tables) {
 }
 
 # ------------------------------------------------------------
+# Application Insights
+# ------------------------------------------------------------
+$appInsightsName = "ai-$projectSlug-$environment-$nameSuffix"
+Write-Host "Creating Application Insights..." -ForegroundColor Cyan
+az monitor app-insights component create `
+  --app $appInsightsName `
+  --location $location `
+  --resource-group $resourceGroupName `
+  --kind web `
+  --application-type web `
+  --retention-time 30 `
+  --output none
+
+$instrumentationKey = az monitor app-insights component show `
+  --app $appInsightsName `
+  --resource-group $resourceGroupName `
+  --query instrumentationKey `
+  --output tsv
+
+Write-Host "Application Insights key: $instrumentationKey"
+
+# ------------------------------------------------------------
+# Budget alerts
+# ------------------------------------------------------------
+Write-Host "Creating budget alerts at £10, £25, £50..." -ForegroundColor Cyan
+
+$budgetName = "budget-$projectSlug-$environment"
+$startDate  = (Get-Date -Day 1).ToString("yyyy-MM-01")
+$endDate    = (Get-Date).AddYears(1).ToString("yyyy-MM-01")
+
+az consumption budget create `
+  --budget-name $budgetName `
+  --amount 50 `
+  --category Cost `
+  --resource-group $resourceGroupName `
+  --time-grain Monthly `
+  --start-date $startDate `
+  --end-date $endDate `
+  --output none 2>$null
+
+Write-Host "Budget created (£50/month cap). Configure email notifications in Azure Portal > Cost Management > Budgets."
+
+# ------------------------------------------------------------
 # Static Web App
 # ------------------------------------------------------------
 Write-Host "Creating Azure Static Web App and linking GitHub repo..." -ForegroundColor Cyan
@@ -135,6 +178,7 @@ az staticwebapp appsettings set `
   --resource-group $resourceGroupName `
   --setting-names `
     AZURE_TABLES_CONNECTION_STRING="$storageConnectionString" `
+    APPINSIGHTS_INSTRUMENTATIONKEY="$instrumentationKey" `
     ADMIN_EMAILS="$adminEmails" `
     TABLE_USERS="$tableUsers" `
     TABLE_THREADS="$tableThreads" `

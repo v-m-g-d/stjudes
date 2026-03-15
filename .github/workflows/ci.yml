@@ -27,3 +27,9 @@ jobs:
       - name: Build api
         run: npm run build
         working-directory: api
+      - name: Lint check (TypeScript)
+        run: npx tsc --noEmit -p .
+        working-directory: web
+      - name: Lint check (API)
+        run: npx tsc --noEmit -p .
+        working-directory: api
