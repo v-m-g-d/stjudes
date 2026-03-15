@@ -98,10 +98,16 @@ function getTableClient(name: string): TableClient | null {
   return TableClient.fromConnectionString(connectionString, name);
 }
 
+function sortByDateDesc<T>(items: T[], dateSelector: (item: T) => string): T[] {
+  return [...items].sort(
+    (left, right) => new Date(dateSelector(right)).getTime() - new Date(dateSelector(left)).getTime(),
+  );
+}
+
 export async function listThreads(): Promise<Thread[]> {
   const client = getTableClient(tableNames.threads);
   if (!client) {
-    return memoryTables.threads;
+    return sortByDateDesc(memoryTables.threads, (item) => item.createdAt);
   }
 
   const entities: Thread[] = [];
@@ -115,7 +121,7 @@ export async function listThreads(): Promise<Thread[]> {
       isApproved: Boolean(entity.isApproved),
     });
   }
-  return entities;
+  return sortByDateDesc(entities, (item) => item.createdAt);
 }
 
 export async function createThread(input: Pick<Thread, "title" | "body" | "createdBy">): Promise<Thread> {
@@ -184,7 +190,10 @@ export async function approveThread(threadId: string): Promise<Thread | null> {
 export async function listComments(threadId: string): Promise<Comment[]> {
   const client = getTableClient(tableNames.comments);
   if (!client) {
-    return memoryTables.comments.filter((comment) => comment.threadId === threadId);
+    return sortByDateDesc(
+      memoryTables.comments.filter((comment) => comment.threadId === threadId),
+      (item) => item.createdAt,
+    );
   }
 
   const entities: Comment[] = [];
@@ -200,7 +209,7 @@ export async function listComments(threadId: string): Promise<Comment[]> {
       isApproved: Boolean(entity.isApproved),
     });
   }
-  return entities;
+  return sortByDateDesc(entities, (item) => item.createdAt);
 }
 
 export async function createComment(
@@ -278,7 +287,22 @@ export async function approveComment(commentId: string): Promise<Comment | null>
 }
 
 export async function listNews(): Promise<NewsItem[]> {
-  return memoryTables.news;
+  const client = getTableClient(tableNames.news);
+  if (!client) {
+    return sortByDateDesc(memoryTables.news, (item) => item.publishedAt);
+  }
+
+  const entities: NewsItem[] = [];
+  for await (const entity of client.listEntities<Record<string, unknown>>()) {
+    entities.push({
+      id: String(entity.rowKey),
+      title: String(entity.title || ""),
+      summary: String(entity.summary || ""),
+      publishedAt: String(entity.publishedAt || ""),
+    });
+  }
+
+  return sortByDateDesc(entities, (item) => item.publishedAt);
 }
 
 export async function createNews(item: Pick<NewsItem, "title" | "summary">): Promise<NewsItem> {
@@ -288,12 +312,41 @@ export async function createNews(item: Pick<NewsItem, "title" | "summary">): Pro
     summary: item.summary,
     publishedAt: new Date().toISOString(),
   };
-  memoryTables.news.unshift(created);
+  const client = getTableClient(tableNames.news);
+  if (!client) {
+    memoryTables.news.unshift(created);
+    return created;
+  }
+
+  await client.upsertEntity({
+    partitionKey: "news",
+    rowKey: created.id,
+    title: created.title,
+    summary: created.summary,
+    publishedAt: created.publishedAt,
+  });
+
   return created;
 }
 
 export async function listPlans(): Promise<PlanItem[]> {
-  return memoryTables.plans;
+  const client = getTableClient(tableNames.plans);
+  if (!client) {
+    return sortByDateDesc(memoryTables.plans, (item) => item.updatedAt);
+  }
+
+  const entities: PlanItem[] = [];
+  for await (const entity of client.listEntities<Record<string, unknown>>()) {
+    entities.push({
+      id: String(entity.rowKey),
+      title: String(entity.title || ""),
+      status: (String(entity.status || "draft") as PlanStatus),
+      updatedAt: String(entity.updatedAt || ""),
+      updatedBy: String(entity.updatedBy || "unknown"),
+    });
+  }
+
+  return sortByDateDesc(entities, (item) => item.updatedAt);
 }
 
 export async function createPlan(item: Pick<PlanItem, "title">): Promise<PlanItem> {
@@ -304,7 +357,21 @@ export async function createPlan(item: Pick<PlanItem, "title">): Promise<PlanIte
     updatedAt: new Date().toISOString(),
     updatedBy: "system",
   };
-  memoryTables.plans.unshift(created);
+  const client = getTableClient(tableNames.plans);
+  if (!client) {
+    memoryTables.plans.unshift(created);
+    return created;
+  }
+
+  await client.upsertEntity({
+    partitionKey: "plan",
+    rowKey: created.id,
+    title: created.title,
+    status: created.status,
+    updatedAt: created.updatedAt,
+    updatedBy: created.updatedBy,
+  });
+
   return created;
 }
 
