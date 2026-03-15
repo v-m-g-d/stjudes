@@ -471,6 +471,23 @@ function App() {
           Welcome to the prototype. Residents can browse updates and contribute
           comments on local topics.
         </p>
+        <div className="home-visual" aria-hidden="true">
+          <div className="street-ground" />
+          <div className="terrace-row">
+            <span className="terrace-house" />
+            <span className="terrace-house" />
+            <span className="terrace-house" />
+            <span className="terrace-house" />
+            <span className="terrace-house" />
+            <span className="terrace-house" />
+          </div>
+          <div className="tree-row">
+            <span className="tree" />
+            <span className="tree" />
+            <span className="tree" />
+            <span className="tree" />
+          </div>
+        </div>
       </section>
 
       <section id="forum" className="card">

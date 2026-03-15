@@ -75,6 +75,90 @@
   max-width: 55ch;
 }
 
+.home-visual {
+  margin-top: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 0.9rem 0.9rem 0.65rem;
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+}
+
+.street-ground {
+  height: 9px;
+  border-radius: 999px;
+  background: #d1d5db;
+  margin-bottom: 0.75rem;
+}
+
+.terrace-row {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.35rem;
+  align-items: end;
+}
+
+.terrace-house {
+  position: relative;
+  height: 58px;
+  border: 1px solid #9ca3af;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(180deg, #dbe3ee 0%, #cbd5e1 100%);
+}
+
+.terrace-house::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  right: -1px;
+  top: -9px;
+  height: 9px;
+  border: 1px solid #94a3b8;
+  border-bottom: 0;
+  border-radius: 4px 4px 0 0;
+  background: #b6c2d2;
+}
+
+.terrace-house::after {
+  content: '';
+  position: absolute;
+  width: 7px;
+  height: 12px;
+  top: -18px;
+  right: 6px;
+  border: 1px solid #94a3b8;
+  border-bottom: 0;
+  border-radius: 2px 2px 0 0;
+  background: #c7d2df;
+}
+
+.tree-row {
+  margin-top: 0.65rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.tree {
+  position: relative;
+  width: 28px;
+  height: 20px;
+  border-radius: 999px;
+  background: #9ec5a8;
+  border: 1px solid #6b9a78;
+}
+
+.tree::before {
+  content: '';
+  position: absolute;
+  width: 5px;
+  height: 12px;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+  background: #8b6b4f;
+}
+
 .hub-nav {
   display: flex;
   flex-wrap: wrap;
@@ -318,6 +402,31 @@
   .card {
     background: #111827;
     border-color: #1f2937;
+  }
+
+  .home-visual {
+    border-color: #374151;
+    background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+  }
+
+  .street-ground {
+    background: #334155;
+  }
+
+  .terrace-house {
+    border-color: #475569;
+    background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+  }
+
+  .terrace-house::before,
+  .terrace-house::after {
+    border-color: #64748b;
+    background: #334155;
+  }
+
+  .tree {
+    border-color: #4b7f5a;
+    background: #4f7f5b;
   }
 
   .list li,
