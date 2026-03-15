@@ -22,12 +22,14 @@ export type NewsItem = {
   id: string;
   title: string;
   summary: string;
+  body: string;
   publishedAt: string;
 };
 
 export type PlanItem = {
   id: string;
   title: string;
+  description: string;
   status: "draft" | "review" | "published";
   updatedAt: string;
   updatedBy: string;
@@ -68,6 +70,7 @@ const memoryTables: Tables = {
       id: "news-1",
       title: "Spring clean-up volunteer day",
       summary: "Meet at the community hall this Saturday at 10am.",
+      body: "We are organising our annual spring clean-up. Bring gloves and bags — refreshments will be provided. Children welcome with a supervising adult.",
       publishedAt: new Date().toISOString(),
     },
   ],
@@ -75,6 +78,7 @@ const memoryTables: Tables = {
     {
       id: "plan-1",
       title: "Church Lane crossing improvements",
+      description: "Proposal to add a raised pedestrian crossing near the school entrance on Church Lane, with improved signage and dropped kerbs.",
       status: "review",
       updatedAt: new Date().toISOString(),
       updatedBy: "admin@example.com",
@@ -102,6 +106,10 @@ function sortByDateDesc<T>(items: T[], dateSelector: (item: T) => string): T[] {
   return [...items].sort(
     (left, right) => new Date(dateSelector(right)).getTime() - new Date(dateSelector(left)).getTime(),
   );
+}
+
+function escapeOData(value: string): string {
+  return value.replace(/'/g, "''");
 }
 
 export async function listThreads(): Promise<Thread[]> {
@@ -198,7 +206,7 @@ export async function listComments(threadId: string): Promise<Comment[]> {
 
   const entities: Comment[] = [];
   for await (const entity of client.listEntities<Record<string, unknown>>({
-    queryOptions: { filter: `threadId eq '${threadId}'` },
+    queryOptions: { filter: `threadId eq '${escapeOData(threadId)}'` },
   })) {
     entities.push({
       id: String(entity.rowKey),
@@ -255,7 +263,7 @@ export async function approveComment(commentId: string): Promise<Comment | null>
   }
 
   for await (const entity of client.listEntities<Record<string, unknown>>({
-    queryOptions: { filter: `RowKey eq '${commentId}'` },
+    queryOptions: { filter: `RowKey eq '${escapeOData(commentId)}'` },
   })) {
     const partitionKey = String(entity.partitionKey || "");
     const rowKey = String(entity.rowKey || "");
@@ -298,6 +306,7 @@ export async function listNews(): Promise<NewsItem[]> {
       id: String(entity.rowKey),
       title: String(entity.title || ""),
       summary: String(entity.summary || ""),
+      body: String(entity.body || ""),
       publishedAt: String(entity.publishedAt || ""),
     });
   }
@@ -305,11 +314,12 @@ export async function listNews(): Promise<NewsItem[]> {
   return sortByDateDesc(entities, (item) => item.publishedAt);
 }
 
-export async function createNews(item: Pick<NewsItem, "title" | "summary">): Promise<NewsItem> {
+export async function createNews(item: Pick<NewsItem, "title" | "summary" | "body">): Promise<NewsItem> {
   const created: NewsItem = {
     id: `news-${Date.now()}`,
     title: item.title,
     summary: item.summary,
+    body: item.body,
     publishedAt: new Date().toISOString(),
   };
   const client = getTableClient(tableNames.news);
@@ -323,6 +333,7 @@ export async function createNews(item: Pick<NewsItem, "title" | "summary">): Pro
     rowKey: created.id,
     title: created.title,
     summary: created.summary,
+    body: created.body,
     publishedAt: created.publishedAt,
   });
 
@@ -340,6 +351,7 @@ export async function listPlans(): Promise<PlanItem[]> {
     entities.push({
       id: String(entity.rowKey),
       title: String(entity.title || ""),
+      description: String(entity.description || ""),
       status: (String(entity.status || "draft") as PlanStatus),
       updatedAt: String(entity.updatedAt || ""),
       updatedBy: String(entity.updatedBy || "unknown"),
@@ -349,10 +361,11 @@ export async function listPlans(): Promise<PlanItem[]> {
   return sortByDateDesc(entities, (item) => item.updatedAt);
 }
 
-export async function createPlan(item: Pick<PlanItem, "title">): Promise<PlanItem> {
+export async function createPlan(item: Pick<PlanItem, "title" | "description">): Promise<PlanItem> {
   const created: PlanItem = {
     id: `plan-${Date.now()}`,
     title: item.title,
+    description: item.description,
     status: "draft",
     updatedAt: new Date().toISOString(),
     updatedBy: "system",
@@ -367,6 +380,7 @@ export async function createPlan(item: Pick<PlanItem, "title">): Promise<PlanIte
     partitionKey: "plan",
     rowKey: created.id,
     title: created.title,
+    description: created.description,
     status: created.status,
     updatedAt: created.updatedAt,
     updatedBy: created.updatedBy,
@@ -414,6 +428,7 @@ export async function updatePlanStatus(
   return {
     id: String(existing.rowKey),
     title: String(existing.title || ""),
+    description: String(existing.description || ""),
     status,
     updatedAt,
     updatedBy,

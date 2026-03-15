@@ -65,6 +65,17 @@ function requireAdmin(request: HttpRequest): HttpResponseInit | null {
   return null;
 }
 
+const MAX_TITLE = 200;
+const MAX_BODY = 5000;
+const MAX_SUMMARY = 1000;
+
+function checkLength(value: string, field: string, max: number): HttpResponseInit | null {
+  if (value.length > max) {
+    return json(400, { message: `${field} must be ${max} characters or fewer` });
+  }
+  return null;
+}
+
 app.http("getHealth", {
   methods: ["GET"],
   route: "health",
@@ -95,6 +106,10 @@ app.http("postThread", {
     if (!title || !content) {
       return json(400, { message: "title and body are required" });
     }
+    const titleError = checkLength(title, "title", MAX_TITLE);
+    if (titleError) return titleError;
+    const bodyError = checkLength(content, "body", MAX_BODY);
+    if (bodyError) return bodyError;
     return json(
       201,
       await createThread({
@@ -135,6 +150,8 @@ app.http("postComment", {
     if (!content) {
       return json(400, { message: "body is required" });
     }
+    const bodyError = checkLength(content, "body", MAX_BODY);
+    if (bodyError) return bodyError;
 
     return json(
       201,
@@ -166,12 +183,19 @@ app.http("postNews", {
     const body = await parseBody(request);
     const title = String(body.title || "").trim();
     const summary = String(body.summary || "").trim();
+    const content = String(body.body || "").trim();
 
     if (!title || !summary) {
       return json(400, { message: "title and summary are required" });
     }
+    const titleError = checkLength(title, "title", MAX_TITLE);
+    if (titleError) return titleError;
+    const summaryError = checkLength(summary, "summary", MAX_SUMMARY);
+    if (summaryError) return summaryError;
+    const bodyError = checkLength(content, "body", MAX_BODY);
+    if (bodyError) return bodyError;
 
-    return json(201, await createNews({ title, summary }));
+    return json(201, await createNews({ title, summary, body: content }));
   },
 });
 
@@ -195,10 +219,15 @@ app.http("postPlans", {
     context.info("Creating plan item");
     const body = await parseBody(request);
     const title = String(body.title || "").trim();
+    const description = String(body.description || "").trim();
     if (!title) {
       return json(400, { message: "title is required" });
     }
-    return json(201, await createPlan({ title }));
+    const titleError = checkLength(title, "title", MAX_TITLE);
+    if (titleError) return titleError;
+    const descError = checkLength(description, "description", MAX_BODY);
+    if (descError) return descError;
+    return json(201, await createPlan({ title, description }));
   },
 });
 

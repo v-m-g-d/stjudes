@@ -24,12 +24,14 @@ type NewsItem = {
   id: string
   title: string
   summary: string
+  body: string
   publishedAt: string
 }
 
 type PlanItem = {
   id: string
   title: string
+  description: string
   status: 'draft' | 'review' | 'published'
   updatedAt: string
   updatedBy: string
@@ -110,7 +112,9 @@ function App() {
   const [commentBody, setCommentBody] = useState('')
   const [newsTitle, setNewsTitle] = useState('')
   const [newsSummary, setNewsSummary] = useState('')
+  const [newsBody, setNewsBody] = useState('')
   const [planTitle, setPlanTitle] = useState('')
+  const [planDescription, setPlanDescription] = useState('')
 
   const [forumQuery, setForumQuery] = useState('')
   const [newsQuery, setNewsQuery] = useState('')
@@ -345,9 +349,10 @@ function App() {
       return
     }
     try {
-      await postJson<NewsItem>('/api/news', { title: newsTitle, summary: newsSummary })
+      await postJson<NewsItem>('/api/news', { title: newsTitle, summary: newsSummary, body: newsBody })
       setNewsTitle('')
       setNewsSummary('')
+      setNewsBody('')
       await loadPrimaryData()
       setStatus('News item created.')
     } catch (error) {
@@ -366,8 +371,9 @@ function App() {
       return
     }
     try {
-      await postJson<PlanItem>('/api/plans', { title: planTitle })
+      await postJson<PlanItem>('/api/plans', { title: planTitle, description: planDescription })
       setPlanTitle('')
+      setPlanDescription('')
       await loadPrimaryData()
       setStatus('Plan item created.')
     } catch (error) {
@@ -661,6 +667,7 @@ function App() {
             <li key={item.id}>
               <strong>{item.title}</strong>
               <p>Status: {item.status}</p>
+              {item.description && <p>{item.description}</p>}
               <p className="meta">Last updated by: {item.updatedBy || 'Unknown'}</p>
             </li>
           ))}
@@ -763,8 +770,13 @@ function App() {
           <textarea
             value={newsSummary}
             onChange={(event) => setNewsSummary(event.target.value)}
-            placeholder="Short update"
+            placeholder="Short summary"
             required
+          />
+          <textarea
+            value={newsBody}
+            onChange={(event) => setNewsBody(event.target.value)}
+            placeholder="Full article content (optional)"
           />
           <button disabled={!canWrite} type="submit">
             Publish news
@@ -778,6 +790,11 @@ function App() {
             onChange={(event) => setPlanTitle(event.target.value)}
             placeholder="Plan title"
             required
+          />
+          <textarea
+            value={planDescription}
+            onChange={(event) => setPlanDescription(event.target.value)}
+            placeholder="Description of the proposal (optional)"
           />
           <button disabled={!canWrite} type="submit">
             Add plan

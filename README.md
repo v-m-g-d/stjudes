@@ -23,10 +23,13 @@ MVP scaffold for a low-traffic community website with sections for Forum, News, 
 - `POST /api/threads`
 - `GET /api/threads/{threadId}/comments`
 - `POST /api/threads/{threadId}/comments`
+- `POST /api/threads/{threadId}/approve` (admin)
+- `POST /api/comments/{commentId}/approve` (admin)
 - `GET /api/news`
-- `POST /api/news`
+- `POST /api/news` (admin)
 - `GET /api/plans`
-- `POST /api/plans`
+- `POST /api/plans` (admin)
+- `POST /api/plans/{planId}/status` (admin)
 
 ## Notes
 - Current API uses an in-memory fallback data layer to keep local startup simple.
