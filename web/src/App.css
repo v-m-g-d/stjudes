@@ -460,3 +460,78 @@
     border-color: #374151;
   }
 }
+
+/* ---- Responsive breakpoints ---- */
+
+@media (max-width: 640px) {
+  .hub-shell {
+    padding: 1rem 0 1.5rem;
+    gap: 0.75rem;
+  }
+
+  .hub-header h1 {
+    font-size: 1.4rem;
+  }
+
+  .hub-nav {
+    gap: 0.35rem;
+  }
+
+  .hub-nav a {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  .card {
+    padding: 0.75rem;
+    border-radius: 10px;
+  }
+
+  .controls input {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .terrace-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .terrace-house {
+    height: 40px;
+  }
+
+  .tree {
+    width: 22px;
+    height: 16px;
+  }
+
+  .moderation-item {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .status-actions {
+    width: 100%;
+  }
+
+  .auth-links {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .auth-links a {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .hub-shell {
+    width: min(900px, 100% - 2rem);
+  }
+
+  .terrace-row {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}

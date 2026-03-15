@@ -446,6 +446,7 @@ function App() {
 
   return (
     <main className="hub-shell">
+      <a href="#home" className="skip-link">Skip to content</a>
       <header className="hub-header">
         <div>
           <p className="eyebrow">St Jude's</p>
@@ -463,9 +464,10 @@ function App() {
           <a href="#admin">Admin</a>
         </nav>
         <div className="toolbar">
-          <p className="status">{status}</p>
+          <p className="status" role="status" aria-live="polite">{status}</p>
           <div className="auth-links">
-            <a href="/.auth/login/aad">Sign in</a>
+            <a href="/.auth/login/aad">Microsoft</a>
+            <a href="/.auth/login/github">GitHub</a>
             <a href="/.auth/logout">Sign out</a>
           </div>
         </div>
