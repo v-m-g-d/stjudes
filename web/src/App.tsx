@@ -459,11 +459,8 @@ function App() {
         <div className="toolbar">
           <p className="status">{status}</p>
           <div className="auth-links">
-            {isAuthenticated ? (
-              <a href="/.auth/logout">Sign out</a>
-            ) : (
-              <a href="/.auth/login/aad">Sign in</a>
-            )}
+            <a href="/.auth/login/aad">Sign in</a>
+            <a href="/.auth/logout">Sign out</a>
           </div>
         </div>
       </header>
