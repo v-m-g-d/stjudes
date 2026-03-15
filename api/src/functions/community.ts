@@ -65,6 +65,18 @@ function requireAdmin(request: HttpRequest): HttpResponseInit | null {
   return null;
 }
 
+app.http("getHealth", {
+  methods: ["GET"],
+  route: "health",
+  authLevel: "anonymous",
+  handler: async () =>
+    json(200, {
+      ok: true,
+      utcNow: new Date().toISOString(),
+      storageConfigured: Boolean(process.env.AZURE_TABLES_CONNECTION_STRING),
+    }),
+});
+
 app.http("getThreads", {
   methods: ["GET"],
   route: "threads",

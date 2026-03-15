@@ -37,6 +37,12 @@ type PlanItem = {
 
 type PlanStatus = PlanItem['status']
 
+type HealthResponse = {
+  ok: boolean
+  utcNow: string
+  storageConfigured: boolean
+}
+
 class ApiError extends Error {
   status: number
 
@@ -220,6 +226,10 @@ function App() {
     }
   }
 
+  async function loadHealth(): Promise<HealthResponse> {
+    return getJson<HealthResponse>('/api/health')
+  }
+
   async function loadComments(threadId: string) {
     if (!threadId) {
       setComments([])
@@ -232,8 +242,9 @@ function App() {
   useEffect(() => {
     const bootstrap = async () => {
       try {
-        await Promise.all([loadAuthState(), loadPrimaryData()])
-        setStatus('Community Hub is ready.')
+        const [, health] = await Promise.all([loadAuthState(), loadHealth(), loadPrimaryData()])
+        const storageMode = health.storageConfigured ? 'table storage' : 'in-memory mode'
+        setStatus(`Community Hub is ready (${storageMode}).`)
       } catch {
         setStatus('Could not load data. Confirm the API is running.')
       }
