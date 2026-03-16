@@ -74,6 +74,13 @@
   background: #e8f0e9;
 }
 
+.auth-user {
+  font-size: 0.9rem;
+  color: #4a7c50;
+  font-weight: 500;
+  padding: 0.35rem 0;
+}
+
 .eyebrow {
   margin: 0;
   font-size: 0.875rem;
@@ -426,6 +433,10 @@
 
   .auth-links a:hover {
     background: #2a3a2c;
+  }
+
+  .auth-user {
+    color: #8fb896;
   }
 
   .controls input,

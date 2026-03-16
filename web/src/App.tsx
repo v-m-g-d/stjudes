@@ -46,7 +46,11 @@ type HealthResponse = {
 }
 
 type AuthMeRecord = {
-  clientPrincipal?: unknown
+  clientPrincipal?: {
+    identityProvider?: string
+    userDetails?: string
+    userRoles?: string[]
+  } | null
 }
 
 class ApiError extends Error {
@@ -105,6 +109,7 @@ function App() {
   const [plans, setPlans] = useState<PlanItem[]>([])
   const [selectedThreadId, setSelectedThreadId] = useState<string>('')
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [userName, setUserName] = useState('')
   const [status, setStatus] = useState('Loading community content...')
 
   const [threadTitle, setThreadTitle] = useState('')
@@ -209,13 +214,22 @@ function App() {
       const response = await fetch('/.auth/me')
       if (!response.ok) {
         setIsAuthenticated(false)
+        setUserName('')
         return
       }
       const payload = (await response.json()) as AuthMeRecord | AuthMeRecord[]
       const records = Array.isArray(payload) ? payload : [payload]
-      setIsAuthenticated(records.some((record) => Boolean(record?.clientPrincipal)))
+      const principal = records.find((r) => r?.clientPrincipal)?.clientPrincipal
+      if (principal) {
+        setIsAuthenticated(true)
+        setUserName(principal.userDetails || principal.identityProvider || 'User')
+      } else {
+        setIsAuthenticated(false)
+        setUserName('')
+      }
     } catch {
       setIsAuthenticated(false)
+      setUserName('')
     }
   }
 
@@ -466,9 +480,17 @@ function App() {
         <div className="toolbar">
           <p className="status" role="status" aria-live="polite">{status}</p>
           <div className="auth-links">
-            <a href="/.auth/login/aad">Microsoft</a>
-            <a href="/.auth/login/github">GitHub</a>
-            <a href="/.auth/logout">Sign out</a>
+            {isAuthenticated ? (
+              <>
+                <span className="auth-user">{userName}</span>
+                <a href="/.auth/logout?post_logout_redirect_uri=/">Sign out</a>
+              </>
+            ) : (
+              <>
+                <a href="/.auth/login/aad?post_login_redirect_uri=/">Microsoft</a>
+                <a href="/.auth/login/github?post_login_redirect_uri=/">GitHub</a>
+              </>
+            )}
           </div>
         </div>
       </header>
