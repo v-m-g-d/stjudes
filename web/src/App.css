@@ -81,6 +81,12 @@
   padding: 0.35rem 0;
 }
 
+.auth-label {
+  font-size: 0.9rem;
+  color: #6b6360;
+  padding: 0.35rem 0;
+}
+
 .eyebrow {
   margin: 0;
   font-size: 0.875rem;
@@ -437,6 +443,10 @@
 
   .auth-user {
     color: #8fb896;
+  }
+
+  .auth-label {
+    color: #a09890;
   }
 
   .controls input,

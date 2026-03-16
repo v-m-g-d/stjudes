@@ -482,11 +482,12 @@ function App() {
           <div className="auth-links">
             {isAuthenticated ? (
               <>
-                <span className="auth-user">{userName}</span>
+                <span className="auth-user">Signed in as {userName}</span>
                 <a href="/.auth/logout?post_logout_redirect_uri=/">Sign out</a>
               </>
             ) : (
               <>
+                <span className="auth-label">Sign in with:</span>
                 <a href="/.auth/login/aad?post_login_redirect_uri=/">Microsoft</a>
                 <a href="/.auth/login/github?post_login_redirect_uri=/">GitHub</a>
               </>
